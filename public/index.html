@@ -15,11 +15,6 @@
     </div>
 </body>
 <script>
-    url = new URL(window.location.href)
-    query = url.searchParams.get("query")
-
-    searchBox = document.getElementById("query")
-
     var divID = 0
 
     document.getElementById('itemContainer').addEventListener('mouseover', function(event) {
@@ -36,7 +31,10 @@
         }
     });
 
-    async function addItem(name, artist, image) {
+    async function addItem(data) {
+        name = data.name
+        artist = data.artistName
+        image = data.image
         addedDiv = document.createElement('div')
 
         addedDiv.id = ("item" + divID)
@@ -70,12 +68,15 @@
         addedDiv.appendChild(artistEle)
     }
 
-    if (query) {
-        searchBox.value = query
+    url = new URL(window.location.href) // Current URL
+    query = url.searchParams.get("query") // URL parameters, contains search
+    searchBox = document.getElementById("query") // The searchbox
+    if (query) { // When search is detected, start search
+        searchBox.value = query // Puts their search into the search box
 
         // Start search
 
-        const params = new URLSearchParams({ 
+        const params = new URLSearchParams({ // Getting query params ready for search
             query: `${query}`
         });
 
@@ -88,8 +89,8 @@
         })
         .then(response => response.json())
         .then(data => {
-            for (i = 0; i <= data.length; i++) {
-                addItem(data[i].name, data[i].artistName, data[i].image)
+            for (i = 0; i < data.length; i++) {
+                addItem(data[i])
             }
         })
         .catch()
