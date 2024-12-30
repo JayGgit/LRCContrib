@@ -1,0 +1,124 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LRC Contrib</title>
+</head>
+<link rel="stylesheet" href="styles.css">
+<body>
+    <form action="/" method="get">
+        <input type="text" placeholder="Search for a song" id="query" name="query">
+    </form>
+
+    <div id="itemContainer" class="itemContainer">
+
+    </div>
+</body>
+<script>
+    url = new URL(window.location.href)
+    query = url.searchParams.get("query")
+
+    searchBox = document.getElementById("query")
+
+    var divID = 0
+
+    document.getElementById('itemContainer').addEventListener('mouseover', function(event) {
+            if (event.target && event.target.classList.contains('child')) {
+                console.log('Mouse entered:', event.target.textContent);
+                // Additional actions when mouse enters a child element
+            }
+        });
+
+    document.getElementById('itemContainer').addEventListener('mouseout', function(event) {
+        if (event.target && event.target.classList.contains('child')) {
+            console.log('Mouse left:', event.target.textContent);
+            // Additional actions when mouse leaves a child element
+        }
+    });
+
+    async function addItem(name, artist, image) {
+        addedDiv = document.createElement('div')
+
+        addedDiv.id = ("item" + divID)
+        divID++
+        addedDiv.className = "itemDiv"
+
+        document.getElementById("itemContainer").appendChild(addedDiv)
+
+
+        boldEle = document.createElement("b")
+        nameEle = document.createElement("p")
+        artistEle = document.createElement("p")
+        imageEle = document.createElement("img")
+
+        nameEle.innerHTML = name
+        nameEle.id = "songName"
+        nameEle.className = "songName"
+
+        artistEle.innerHTML = artist
+        artistEle.id = "artistName"
+        artistEle.className = "artistName"
+
+        imageEle.src = image
+        imageEle.alt = name + " album image"
+        artistEle.id = "albumImage"
+        imageEle.className = "albumImage"
+
+        addedDiv.appendChild(imageEle)
+        addedDiv.appendChild(boldEle)
+        boldEle.appendChild(nameEle)
+        addedDiv.appendChild(artistEle)
+    }
+
+    if (query) {
+        searchBox.value = query
+
+        // Start search
+
+        const params = new URLSearchParams({ 
+            query: `${query}`
+        });
+
+        fetch(`${window.location.origin}/api/search?${params}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Lrclib-Client": "LRCContrib v0.1.0a (https://github.com/JayGgit/LRCContrib)"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            for (i = 0; i <= data.length; i++) {
+                addItem(data[i].name, data[i].artistName, data[i].image)
+            }
+        })
+        .catch()
+    }
+
+    function getLyrics(name, artist) {
+        searchBox.value = query;
+
+        // Start search
+
+        const params = new URLSearchParams({ 
+            track_name: `${name}`, 
+            artist_name: `${artist}` 
+        });
+
+        fetch(`https://lrclib.net/api/get?${params}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Lrclib-Client": "LRCContrib v0.1.0a (https://github.com/JayGgit/LRCContrib)"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            return(data)
+        })
+        .catch(error => console.error("Error:", error))
+    }
+
+</script>
+</html>
