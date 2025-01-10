@@ -6,9 +6,11 @@
 </head>
 <link rel="stylesheet" href="styles.css">
 <body>
-    <form action="/" method="get">
-        <input type="text" placeholder="Search for a song" id="query" name="query">
-    </form>
+    <div class="formContainer">
+        <form action="/" method="get">
+            <input type="text" placeholder="Search for a song" id="query" name="query" class="query">
+        </form>
+    </div>
 
     <div id="itemContainer" class="itemContainer">
 
@@ -37,8 +39,7 @@
         image = data.image
         addedDiv = document.createElement('div')
 
-        addedDiv.id = ("item" + divID)
-        divID++
+        addedDiv.id = ("itemContainerIndividual" + divID)
         addedDiv.className = "itemDiv"
 
         document.getElementById("itemContainer").appendChild(addedDiv)
@@ -48,6 +49,7 @@
         nameEle = document.createElement("p")
         artistEle = document.createElement("p")
         imageEle = document.createElement("img")
+        backgroundEle = document.createElement("img")
 
         nameEle.innerHTML = name
         nameEle.id = "songName"
@@ -59,13 +61,22 @@
 
         imageEle.src = image
         imageEle.alt = name + " album image"
-        artistEle.id = "albumImage"
+        imageEle.id = "albumImage"
         imageEle.className = "albumImage"
+
+        backgroundEle.src = image
+        backgroundEle.alt = name + " album image background"
+        backgroundEle.id = ("backgroundImage"+divID)
+        backgroundEle.className = "backgroundImage"
+        backgroundEle.style.opacity = "0"
 
         addedDiv.appendChild(imageEle)
         addedDiv.appendChild(boldEle)
         boldEle.appendChild(nameEle)
         addedDiv.appendChild(artistEle)
+        document.body.appendChild(backgroundEle)
+
+        divID++
     }
 
     url = new URL(window.location.href) // Current URL
@@ -120,6 +131,32 @@
         })
         .catch(error => console.error("Error:", error))
     }
+
+    addEventListener("mouseover", (event) => { // For background hover effect
+        if (event.target && (event.target.id.includes("itemContainerIndividual"))) {
+            console.log((("backgroundImage")+(event.target.id.replace("itemContainerIndividual", ""))))
+            backgroundEle = document.getElementById(("backgroundImage")+(event.target.id.replace("itemContainerIndividual", "")))
+            if (backgroundEle) {
+                backgroundEle.style.opacity = "1"
+            }
+            else {
+                console.error("Couldn't find respective background image")
+            }
+        }
+    });
+
+    addEventListener("mouseout", (event) => { // For background hover effect
+        if (event.target && (event.target.id.includes("itemContainerIndividual"))) {
+            console.log((("backgroundImage")+(event.target.id.replace("itemContainerIndividual", ""))))
+            backgroundEle = document.getElementById(("backgroundImage")+(event.target.id.replace("itemContainerIndividual", "")))
+            if (backgroundEle) {
+                backgroundEle.style.opacity = "0"
+            }
+            else {
+                console.error("Couldn't find respective background image")
+            }
+        }
+    });
 
 </script>
 </html>

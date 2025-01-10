@@ -2,9 +2,41 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.query {
+    width: 95vw;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    transition: box-shadow 0.2s;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.query:focus {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    outline: none;
+}
+
+.query:hover {
+    width: 97.5vw;
+}
+
+.formContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: left;
+}
+
 .itemContainer div {
     width: 95vw;
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.2);
     -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
     border-radius: 10px;
@@ -12,10 +44,14 @@ body {
     display: flex;
     justify-content: left;
     align-items: center;
+
+    transition: background-color 0.2s;
+    transition: width 0.2s;
 }
 
 .itemContainer div:hover {
     background-color: rgba(255, 255, 255, 0.8);
+    width: 97.5vw;
 }
 
 .itemContainer * {
@@ -25,4 +61,16 @@ body {
 .itemContainer img {
     width: 5vw;
     border-radius: 5px;
+}
+
+.backgroundImage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    object-fit: cover;
+    filter: blur(100px);
+    transition: opacity 0.5s;
 }
