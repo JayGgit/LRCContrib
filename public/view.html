@@ -1,0 +1,117 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="docTitle">Lyrics Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="songInfo" class="songInfo">
+        <img id="songImage" alt="Song Image">
+        <div style="display: inline-block;">
+            <b><p id="songTitle" class="songTitle"></p></b>
+            <p id="artistTitle" class="artistTitle"></p>
+        </div>
+    </div>
+    <div id="lyricsContainer">
+        <input type="text" id="lyrics" class="lyrics">
+    </div>
+</body>
+<script>
+    function setSong(data) {
+        artist = data[0].artistName
+        name = data[0].name
+        image = data[0].image
+        id = data[0].geniusID
+
+        nameEncoded = encodeURIComponent(name).replace("%E2%80%8B", "")
+
+        // An array because backend kinda sucks
+
+        document.getElementById("songTitle").innerHTML = name
+        document.getElementById("artistTitle").innerHTML = artist
+        document.getElementById("songImage").src = image
+
+        getLyrics(nameEncoded, artist).then(data => {
+            console.log(data)
+            document.getElementById("lyrics").innerHTML = data
+        })
+    }
+    async function getLyrics(name, artist) {
+        // Start search
+        try {
+            const response = await fetch("https://lrclib.net/api/get?track_name=" + name + "&artist_name=" + artist, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Lrclib-Client": "LRCContrib v0.1.0a (https://github.com/JayGgit/LRCContrib)"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("getLyrics data:", data); // Log the data object to see its structure
+            return data;
+        } catch (error) {
+            console.error("Error:", error);
+            return null;
+        }
+    }
+    function getSongInfo(name, artist) {
+        const params = new URLSearchParams({ // Getting query params ready for search
+            query: `${name}`
+        });
+
+        fetch(`${window.location.origin}/api/search?${params}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Lrclib-Client": "LRCContrib v0.1.0a (https://github.com/JayGgit/LRCContrib)"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            for (i = 0; i < data.length; i++) {
+                addItem(data[i])
+            }
+        })
+        .catch()
+    }
+    function getSongFromID(id) {
+        const params = new URLSearchParams({ // Getting query params ready for search
+            id: `${id}`
+        });
+
+        fetch(`${window.location.origin}/api/getId?${params}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Lrclib-Client": "LRCContrib v0.1.0a (https://github.com/JayGgit/LRCContrib)"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            setSong(data)
+        })
+        .catch()
+    }
+
+    // Get name and artist from URL
+    url = new URL(window.location.href)
+    title = url.searchParams.get("name")
+    artist = url.searchParams.get("artist")
+    id = url.searchParams.get("id")
+
+    if (!(title && artist && id)) {
+        location.href = "/"
+    }
+
+    getSongFromID(id)
+    
+    // Make title
+    document.getElementById("docTitle").innerHTML = title + " Lyrics"
+</script>
+</html>
