@@ -34,7 +34,7 @@ body {
     justify-content: left;
 }
 
-.itemContainer div {
+.itemContainer .itemDiv {
     width: 95vw;
     background-color: rgba(255, 255, 255, 0.2);
     -webkit-backdrop-filter: blur(5px);
@@ -49,9 +49,8 @@ body {
     transition: width 0.2s;
 }
 
-.itemContainer div:hover {
+.itemContainer .itemDiv:hover {
     background-color: rgba(255, 255, 255, 0.8);
-    width: 97.5vw;
 }
 
 .itemContainer * {
@@ -73,4 +72,32 @@ body {
     object-fit: cover;
     filter: blur(100px);
     transition: opacity 0.5s;
+}
+
+.hoverEle {
+    margin: 0;
+    visibility: none;
+}
+
+.songInfo {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.songInfo img {
+    width: 5vw;
+    border-radius: 5px;
+}
+
+.songInfo * {
+    margin: 5px;
+}
+
+.songInfo .songTitle {
+    font-size: 16px;
+}
+
+.songInfo .artistTitle {
+    font-size: 12px;
 }

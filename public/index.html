@@ -3,8 +3,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LRC Contrib</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<link rel="stylesheet" href="styles.css">
 <body>
     <div class="formContainer">
         <form action="/" method="get">
@@ -37,10 +37,12 @@
         name = data.name
         artist = data.artistName
         image = data.image
+        id = data.geniusID
         addedDiv = document.createElement('div')
 
         addedDiv.id = ("itemContainerIndividual" + divID)
         addedDiv.className = "itemDiv"
+        addedDiv.setAttribute('data-id', id);
 
         document.getElementById("itemContainer").appendChild(addedDiv)
 
@@ -50,6 +52,7 @@
         artistEle = document.createElement("p")
         imageEle = document.createElement("img")
         backgroundEle = document.createElement("img")
+        hoverEle = document.createElement("div")
 
         nameEle.innerHTML = name
         nameEle.id = "songName"
@@ -63,20 +66,37 @@
         imageEle.alt = name + " album image"
         imageEle.id = "albumImage"
         imageEle.className = "albumImage"
+        imageEle.fetchPriority = "high"
 
         backgroundEle.src = image
         backgroundEle.alt = name + " album image background"
         backgroundEle.id = ("backgroundImage"+divID)
         backgroundEle.className = "backgroundImage"
         backgroundEle.style.opacity = "0"
+        backgroundEle.fetchPriority = "low"
+
+        hoverEle.id = ("hover"+divID)
+        hoverEle.className = "hoverEle"
+        hoverEle.style.position = "absolute";
+        hoverEle.style.top = "0";
+        hoverEle.style.left = "0";
+        hoverEle.style.width = "100%";
+        hoverEle.style.height = "100%";
+        hoverEle.style.cursor = "pointer";
+        hoverEle.href = "/view?name="+name+"&artist="+artist;
 
         addedDiv.appendChild(imageEle)
         addedDiv.appendChild(boldEle)
         boldEle.appendChild(nameEle)
         addedDiv.appendChild(artistEle)
         document.body.appendChild(backgroundEle)
+        addedDiv.appendChild(hoverEle)
 
         divID++
+    }
+
+    function clickItem(name, artist, id) {
+        location.href = "/view?name="+name+"&artist="+artist+"&id="+id;
     }
 
     url = new URL(window.location.href) // Current URL
@@ -100,6 +120,7 @@
         })
         .then(response => response.json())
         .then(data => {
+            console.log(data)
             for (i = 0; i < data.length; i++) {
                 addItem(data[i])
             }
@@ -133,9 +154,8 @@
     }
 
     addEventListener("mouseover", (event) => { // For background hover effect
-        if (event.target && (event.target.id.includes("itemContainerIndividual"))) {
-            console.log((("backgroundImage")+(event.target.id.replace("itemContainerIndividual", ""))))
-            backgroundEle = document.getElementById(("backgroundImage")+(event.target.id.replace("itemContainerIndividual", "")))
+        if (event.target && (event.target.id.includes("hover"))) {
+            backgroundEle = document.getElementById(("backgroundImage")+(event.target.id.replace("hover", "")))
             if (backgroundEle) {
                 backgroundEle.style.opacity = "1"
             }
@@ -146,15 +166,23 @@
     });
 
     addEventListener("mouseout", (event) => { // For background hover effect
-        if (event.target && (event.target.id.includes("itemContainerIndividual"))) {
-            console.log((("backgroundImage")+(event.target.id.replace("itemContainerIndividual", ""))))
-            backgroundEle = document.getElementById(("backgroundImage")+(event.target.id.replace("itemContainerIndividual", "")))
+        if (event.target && (event.target.id.includes("hover"))) {
+            backgroundEle = document.getElementById(("backgroundImage")+(event.target.id.replace("hover", "")))
             if (backgroundEle) {
                 backgroundEle.style.opacity = "0"
             }
             else {
                 console.error("Couldn't find respective background image")
             }
+        }
+    });
+
+    addEventListener("click", (event) => { // For clicking on an item
+        if (event.target && (event.target.id.includes("hover"))) {
+            name = event.target.parentElement.childNodes[1].childNodes[0].textContent
+            artist = event.target.parentElement.childNodes[2].textContent
+            id = event.target.parentElement.getAttribute('data-id')
+            clickItem(name, artist, id)
         }
     });
 
