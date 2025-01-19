@@ -101,3 +101,25 @@ body {
 .songInfo .artistTitle {
     font-size: 12px;
 }
+
+.lyrics {
+    width: 95vw;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    transition: box-shadow 0.2s;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.current-lyric {
+    background-color: yellow;
+    transition: background-color 0.3s;
+    font-weight: bold;
+}

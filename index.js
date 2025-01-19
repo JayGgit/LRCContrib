@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const bodyParser = require('body-parser')
+const multer = require('multer');
+const upload = multer();
 const path = require("path")
 const axios = require('axios')
 const crypto = require('crypto');
@@ -26,17 +28,20 @@ function verify_nonce(result, target) {
     return true;
 }
 
-function solve(prefix, target_hex) {
+async function solve(prefix, target_hex) {
+    return("Not functional. Solve crypto on client side")
     let nonce = 0;
     const target = Buffer.from(target_hex, 'hex');
 
-    console.log('');
+    console.log('Starting solver...');
     while (true) {
-        if (nonce % 100000 === 0)
-            console.log(`Solver - Nonce (~100000): ${nonce}`);
+        if (nonce % 100000 === 0){
+            // console.log(`Solver - Nonce (~100000): ${nonce}`);
+        }
         const input = `${prefix}${nonce}`;
         const hashed = crypto.createHash('sha256').update(input).digest();
         if (verify_nonce(hashed, target)) {
+            console.log("Found " + nonce + " for " + prefix + " with target " + target_hex);
             break;
         } else {
             nonce++;
@@ -48,14 +53,10 @@ function solve(prefix, target_hex) {
 
 // Captcha validator
 
-function validateCaptcha(token) {
+async function validateCaptcha(token) {
     verify(hCaptchaSecret, token)
         .then((data) => {
-        if (data.success === true) {
-            return(true)
-        } else {
-            return(false)
-        }
+            return data;
         })
         .catch(console.error);
 }
@@ -66,6 +67,8 @@ const PORT = 8080;
 
 // Public folder middleware
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(express.json());
 
 // Landing Page
 app.get('/', (req, res) => {
@@ -143,15 +146,42 @@ app.get('/api/getId', (req, res) => {
     }
 })
 
-app.post('/api/getToken', bodyParser.text(), function (req, res) {
-    console.log(req.body)
-    if (validateCaptcha(req.body.token)) {
-        console.log("valid")
-        res.send(solve(req.query.prefix, req.query.target))
-    } else {
-        console.log("invalid")
-        res.sendStatus(400)
+app.post('/api/getToken', upload.none(), function (req, res) {
+    res.status(400).send('Not functional. Solve crypto on client side');
+    const token = req.body.token;
+    if (!token) {
+        return res.status(400).json({
+            error: 'Missing token',
+            details: 'Token is required in form data',
+            receivedBody: req.body
+        });
     }
+    async function waitForValidation() {
+        verify(hCaptchaSecret, token)
+            .then((data) => {
+                if (data.success) {
+                    // Get challenge
+                    try {
+                        const response = axios.post('https://lrclib.net/api/request-challenge', {
+                            headers: {
+                                "Lrclib-Client": "LRCContrib v0.1.0a (https://github.com/JayGgit/LRCContrib)",
+                                "Authorization": `Bearer ${genuisAPI}` 
+                            }
+                        })
+                        .then (async data => {
+                            solvedData = await solve(data.data.prefix, data.data.target)
+                            res.status(200).send(solvedData)
+                        })
+                    } catch (error) {
+                        res.status(500).send('Error fetching song details:', error);
+                    }
+                } else {
+                    res.status(400).send(data);
+                }
+            })
+            .catch(console.error);
+    }
+    waitForValidation();
 });
 
 // 404 Not Found
